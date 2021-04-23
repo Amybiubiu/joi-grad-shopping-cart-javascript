@@ -1,3 +1,4 @@
+import { loadPartialConfig } from "@babel/core";
 import _ from "lodash";
 import Order from "./Order.js";
 
@@ -18,8 +19,9 @@ export default class ShoppingCart {
     checkout = () => {
         let totalPrice = 0;
         let loyaltyPointsEarned = 0;
-
-        this.products.forEach(product => {
+        const freeNum = Math.floor(this.products.length/3);
+        const filterProducts = this.products.sort((a, b) => b.price - a.price).slice(0, this.products.length - freeNum);
+        filterProducts.forEach(product => {
             let discount = 0;
             if (product.code.startsWith("DIS_10")) {
                 discount = product.price * 0.1;
@@ -27,6 +29,9 @@ export default class ShoppingCart {
             } else if (product.code.startsWith("DIS_15")) {
                 discount = product.price * 0.15;
                 loyaltyPointsEarned += product.price / 15;
+            } else if (product.code.startsWith('DIS_20')){
+                discount = product.price * 0.20;
+                loyaltyPointsEarned += product.price / 20;
             } else {
                 loyaltyPointsEarned += product.price / 5;
             }
